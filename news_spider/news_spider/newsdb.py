@@ -10,18 +10,31 @@ This Script Provides Basic DB Operation
 """
 
 import pymongo
+from settings import DB_IP, DB_PORT
 
-def _get_db(ip = "127.0.0.1"):
-    con = pymongo.Connection(ip)
-    db = con['sina_news']
+def _get_db():
+    con = pymongo.Connection(DB_IP, DB_PORT)
+    db = con['news']
     return db
 
 db = _get_db()
 
 def get_news_link(cond):
+    """
+    Get News Link.
+    Data Include: 
+        title
+        url
+        time
+        type.
+    """
     return db.news_link.find_one(cond)
 
 def insert_news_link(data):
+    """
+    Insert News Link.
+    url unique.
+    """
     if 'url' not in data:
         raise Exception("Lack of Url Key")
 
@@ -29,9 +42,24 @@ def insert_news_link(data):
         db.news_link.insert(data)
 
 def get_news(cond):
+    """
+    Get News Info
+    Data Include: 
+        url
+        title
+        pubDate
+        text
+        commentNumber
+        titleLen
+        textLen
+    """
     return db.news.find_one(cond)
 
 def insert_news(data):
+    """
+    Insert News.
+    url unique
+    """
     if 'url' not in data:
         raise Exception("Lack of Url Key")
     if not get_news({"url": data['url']}):

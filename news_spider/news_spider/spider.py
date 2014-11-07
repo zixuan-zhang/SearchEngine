@@ -20,22 +20,15 @@ from lxml import html
 import pymongo
 
 import newsdb
-
-# log format config
-FORMAT = '%(asctime)s %(levelname)s %(name)s %(message)s'
-logging.basicConfig(filename = 'log', level = logging.INFO, format = FORMAT)
-_LOGGER = logging.getLogger()
-
-ROLL_PAGE = [{"SINA": "http://roll.sports.sina.com.cn/s/channel.php?ch=02#col=64&date=%s&ch=02&offset_page=0&offset_num=0&num=10000&page=1"}
-        ]
-CMNT_BASE_URL = "http://comment5.news.sina.com.cn/page/info?format=js&jsvar=pagedata&channel=ty&newsid=%s&group=0&page=1&list=all&fr=ct"
+from settings import _LOGGER, CMNT_BASE_URL, INTERVAL, NEWS_ID_REG,\
+        NEWS_LIST_REG, XPATHS, NEWS_TYPE
 
 class NewsCrawler():
     """
     Crawler Class
     """
 
-    def __init__(self, basicUrl, site, startDate, endDate, interval=2):
+    def __init__(self, basicUrl, site, startDate, endDate, interval=INTERVAL):
         """
         Initialize NewsCrawler Class
         """
@@ -81,12 +74,12 @@ class NewsCrawler():
         try:
             page = urllib2.urlopen(request).read()
         except Exception, err:
-            print "Open Link Error %s %s" % (rollpage,err)
+            _LOGGER.warning("Open RollPage Error %s %s" % (rollpage, err))
             if count >= 3:
                 return []
             count += 1
 
-        content_list = re.findall(r',title[^}]*', page, re.M);
+        content_list = re.findall(NEWS_LIST_REG, page, re.M);
         news_list = []
         for content in content_list:
             items = content.split(',')
@@ -102,23 +95,17 @@ class NewsCrawler():
                     value = value.strip('"')
                     value = value.strip("'")
                 except IndexError, err:
-                    print item
+                    _LOGGER.warning("Extract News List Error %s %s" % (item, err))
                     break
                 if key == "title":
                     value = value.decode('gbk')
                 key = key.encode('utf-8')
                 value = value.encode('utf-8')
                 news[key] = value
-            if(news['type'] == "1"):
+            if(int(news['type']) in NEWS_TYPE):
                 news_list.append(news)
                     
         return news_list
-
-    def parse_news_list(self, list_html):
-        """
-        Parse News List Html To a List of News
-        """
-        pass
 
     def save_news_list(self, news_list):
         for news in news_list:
@@ -167,7 +154,7 @@ class NewsCrawler():
             return 0
 
     def _get_commentid_reg(self, page):
-        reg = """newsid:[0-9\-'"]+,"""
+        reg = NEWS_LIST_REG
         pattern = re.compile(reg)
         res = pattern.findall(page)
         newsId = None
@@ -188,15 +175,11 @@ class NewsCrawler():
             return False
 
         dom = html.fromstring(page)
-        xpaths = {"title": "//div[@class='blkContainerSblk']/h1[@id='artibodyTitle']//text()",
-                "pubDate": "//div[@class='blkContainerSblk']/div[@class='artInfo']/span[@id='pub_date']/text()",
-                "text": "//div[@class='blkContainerSblk']/div[@id='artibody']/p/text()",
-                "commentId": "//meta[@name='comment']/@content"}
 
-        titles = dom.xpath(xpaths['title'])
-        pubDate = dom.xpath(xpaths['pubDate'])
-        texts = dom.xpath(xpaths['text'])
-        comment = dom.xpath(xpaths['commentId'])
+        titles = dom.xpath(XPATHS['title'])
+        pubDate = dom.xpath(XPATHS['pubDate'])
+        texts = dom.xpath(XPATHS['text'])
+        comment = dom.xpath(XPATHS['commentId'])
 
         commentId = ""
         title = ""
@@ -257,6 +240,8 @@ class NewsCrawler():
         newsList = self.crawl_news_list(rollPage)
         _LOGGER.info("NEWS_LIST_CRAWLED LEN : %d" % len(newsList))
         for news in newsList:
+            start = time.time()
+
             newsUrl = news["url"]
             result = self.crawl_news(newsUrl)
             if result:
@@ -266,48 +251,6 @@ class NewsCrawler():
             else:
                 _LOGGER.warning("CRAWL_NEWS_FAILED %s" % newsUrl)
 
-def crawl_list_test():
-    url = "http://roll.sports.sina.com.cn/interface/rollnews_ch_out_interface.php?col=94&num=10000&date=%s"
-    newsCrawler = NewsCrawler(url, "sina", "2012-11-10", "2012-11-16")
-    news_list = newsCrawler.news_crawler()
-
-def crawl_news_test():
-
-    url = "http://roll.sports.sina.com.cn/interface/rollnews_ch_out_interface.php?col=94&num=10000&date=%s"
-    """
-    url1 = "http://sports.sina.com.cn/t/2014-09-28/23537351504.shtml" #jinzhigui
-    url2 = "http://sports.sina.com.cn/t/2014-11-01/02057391141.shtml" #feitianwang
-    url3 = "http://sports.sina.com.cn/golf/2010-06-02/14325016287.shtml" #quanyunhui
-    url4 = "http://sports.sina.com.cn/yayun2014/o/2014-09-28/23227351481.shtml"
-    url5 = "http://sports.sina.com.cn/t/2014-09-28/21577351365.shtml"
-    url6 = "http://sports.sina.com.cn/yayun2014/o/2014-09-28/17217350973.shtml"
-    """
-    url7 = "http://sports.sina.com.cn/golf/2012-11-06/15256286244.shtml"
-    newsCrawler = NewsCrawler(url, "sina", "2012-1-1", "2013-1-2")
-    newsCrawler.crawl_news(url7)
-    return 
-
-    con = pymongo.Connection('127.0.0.1')
-    db = con['news']
-    news = db.news_link.find().limit(500)
-
-    start = None
-    end = None
-    count = 0
-    for n in news:
-        _LOGGER.info("News Count is %d" % count)
-        url = n['url']
-        start = time.time()
-        newsCrawler.crawl_news(url)
-        end = time.time()
-        if end-start < 1:
-            time.sleep(1 - end + start)
-        count += 1
-    
-def main():
-    crawl_list_test()
-
-    #crawl_news_test()
-
-if __name__ == "__main__":
-    main()
+            cost = time.time() - start
+            if cost < self.interval:
+                time.sleep(self.interval - cost)
