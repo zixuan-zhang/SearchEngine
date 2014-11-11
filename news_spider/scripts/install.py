@@ -1,8 +1,3 @@
-'''
-Created on Apr 20, 2011
-
-@author: chzhong
-'''
 import sys
 import os
 

@@ -1,16 +1,4 @@
 #!/bin/bash
-#
-# Weibonews InfoSniffer Service init script
-# 
-### BEGIN INIT INFO
-# Provides:          weibonews-linkcrawler
-# Required-Start:    $remote_fs $remote_fs $network $syslog
-# Required-Stop:     $remote_fs $remote_fs $network $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Start Weibonews LinkCrawler Service at boot time
-# Description:       Weibonews linkcrawler Service scan detect new links and trigger extractor task.
-### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/var/app/news_spider
 NAME=news_spider

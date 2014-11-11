@@ -1,10 +1,4 @@
 #!/bin/bash
-#
-# This scripts is used to stop the application.
-#
-#
-# Author : chzhong 
-#
 
 PID_FILE=/var/run/news_spider.pid
 SERVICE_NAME="News Spider Service"

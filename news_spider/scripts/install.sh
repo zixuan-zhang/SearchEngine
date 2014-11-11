@@ -3,9 +3,6 @@
 # This scripts is used for installing project.
 # This scripts is required for all projects.
 #
-#
-# Author : chzhong 
-#
 
 python setup.py -q build
 

@@ -3,10 +3,8 @@
 # This scripts is used to install dependencies for the application.
 #
 #
-# Author : chzhong 
 #
 
-# dependency scrapyd-0.12/scrapy-0.12 does not install here for it daemon process issues and need install in projects import it.
 SYS_DEPS=( python-pip python2.7-dev mongodb)
 
 PYTHON_DEPS=( "pymongo==2.2" "lxml")
