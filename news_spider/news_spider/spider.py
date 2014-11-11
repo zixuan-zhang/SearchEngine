@@ -72,13 +72,15 @@ class NewsCrawler():
         request.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14) \
                 Gecko/20080404 (FoxPlus) Firefox/2.0.0.14')
         count = 0
-        try:
-            page = urllib2.urlopen(request).read()
-        except Exception, err:
-            _LOGGER.warning("Open RollPage Error %s %s" % (rollpage, err))
-            if count >= 3:
-                return []
-            count += 1
+        while True:
+            try:
+                page = urllib2.urlopen(request).read()
+                break
+            except Exception, err:
+                _LOGGER.warning("Open RollPage Error %s %s" % (rollpage, err))
+                if count >= 3:
+                    return []
+                count += 1
 
         content_list = re.findall(NEWS_LIST_REG, page, re.M);
         news_list = []
