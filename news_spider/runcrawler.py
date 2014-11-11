@@ -6,12 +6,12 @@ from daemon import Daemon, daemon_main
 
 from news_spider.spider import NewsCrawler
 from news_spider.settings import _LOGGER, START_DATE, END_DATE,\
-        BASE_ROLLPAGE, SITE
+        BASE_ROLLPAGE, SITE, MODE
 
 def news_crawler():
     try:
         newsCrawler = NewsCrawler(BASE_ROLLPAGE, SITE, START_DATE, END_DATE)
-        newsCrawler.news_crawler()
+        newsCrawler.news_crawler(MODE)
     except Exception, err:
         _LOGGER.error(err)
 

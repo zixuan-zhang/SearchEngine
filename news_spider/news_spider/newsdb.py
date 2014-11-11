@@ -14,7 +14,7 @@ from settings import DB_IP, DB_PORT
 
 def _get_db():
     con = pymongo.Connection(DB_IP, DB_PORT)
-    db = con['news']
+    db = con['sina_news']
     return db
 
 db = _get_db()

@@ -21,7 +21,8 @@ import pymongo
 
 import newsdb
 from settings import _LOGGER, CMNT_BASE_URL, INTERVAL, NEWS_ID_REG,\
-        NEWS_LIST_REG, XPATHS, NEWS_TYPE
+        NEWS_LIST_REG, XPATHS, NEWS_TYPE, BASE_ROLLPAGE_NODATE,\
+        CRAWL_INTERVAL
 
 class NewsCrawler():
     """
@@ -223,10 +224,35 @@ class NewsCrawler():
                 "text": text}
         return news
 
-    def news_crawler(self):
+    def news_crawler(self, MODE):
         """
         Class API
         """
+        if MODE == 2:
+            self.crawl_as_dates()
+        elif MODE == 1:
+            self.crawl_as_realtime()
+
+    def crawl_as_realtime(self):
+        while True:
+            newsList = self.crawl_news_list(BASE_ROLLPAGE_NODATE)
+            newsList = self.news_list_filter(newsList)
+            _LOGGER.info("RealTime NewsList Count %d" % len(newsList))
+            for news in newsList:
+                self.crawl_news(news['url'])
+                self.save_news_link(news)
+            time.sleep(CRAWL_INTERVAL)
+
+    def news_list_filter(self, newsList):
+        newNewsList = []
+        for news in newsList:
+            if "url" not in news:
+                _LOGGER.warning("NewsListParseError No Url")
+            elif not newsdb.get_news_link({"url": news["url"]}):
+                newNewsList.append(news)
+        return newNewsList
+
+    def crawl_as_dates(self):
         for date in self.dateRange:
             self.crawl_as_date(date)
 

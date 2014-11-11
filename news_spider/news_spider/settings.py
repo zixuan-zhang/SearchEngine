@@ -8,12 +8,11 @@ This Script Contains Service Settings
 
 import logging
 
-
 # Service Mode
 # Type : int
 # 1 : Crawl News in Real Time
 # 2 : Crawl News as Date
-MODE = 2
+MODE = 1
 
 # If Mode above set to be 2, START_DATE&END_DATE must be given
 # Date format: YYYY-MM-DD
@@ -45,6 +44,8 @@ SITE = "sina"
 # Base RollPage Url, Date Parameter not Included
 # Type : String
 BASE_ROLLPAGE = "http://roll.sports.sina.com.cn/interface/rollnews_ch_out_interface.php?col=94&num=10000&date=%s"
+# Base RollPage Url, No Date Parameter
+BASE_ROLLPAGE_NODATE = "http://roll.sports.sina.com.cn/interface/rollnews_ch_out_interface.php?col=94&num=1000"
 # Base Comment Get Url. NewsId Parameter Missed
 # Type : String
 CMNT_BASE_URL = "http://comment5.news.sina.com.cn/page/info?format=js&jsvar=pagedata&channel=ty&newsid=%s&group=0&page=1&list=all&fr=ct"
@@ -66,7 +67,7 @@ XPATHS = {"title": "//div[@class='blkContainerSblk']/h1[@id='artibodyTitle']//te
 # Crawl Interval
 # Defaul 0
 INTERVAL = 0
-
+CRAWL_INTERVAL = 10*60 #10 Minutes
 
 # Initialization
 logging.basicConfig(filename = LOG_NAME, level = logging.INFO, format = LOG_FORMAT)
