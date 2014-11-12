@@ -12,14 +12,14 @@ import logging
 # Type : int
 # 1 : Crawl News in Real Time
 # 2 : Crawl News as Date
-MODE = 1
+MODE = 2
 
 # If Mode above set to be 2, START_DATE&END_DATE must be given
 # Date format: YYYY-MM-DD
 # Type : String
 # START_DATE is Supposed Less Than END_DATE
-START_DATE = "2013-10-10"
-END_DATE = "2013-10-11"
+START_DATE = "2012-06-12"
+END_DATE = "2013-01-01"
 
 # DB Settings
 # TYPE : DB_IP   String
@@ -66,7 +66,7 @@ XPATHS = {"title": "//div[@class='blkContainerSblk']/h1[@id='artibodyTitle']//te
      "commentId": "//meta[@name='comment']/@content"}
 # Crawl Interval
 # Defaul 0
-INTERVAL = 0
+INTERVAL = 1.5
 CRAWL_INTERVAL = 10*60 #10 Minutes
 
 # Initialization

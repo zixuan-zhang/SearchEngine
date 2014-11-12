@@ -14,6 +14,7 @@ def news_crawler():
         newsCrawler.news_crawler(MODE)
     except Exception, err:
         _LOGGER.error(err)
+        _LOGGER.error("%s" % traceback.format_exc())
 
 class CrawlerDaemon(Daemon):
     '''
