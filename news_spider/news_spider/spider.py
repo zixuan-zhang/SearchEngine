@@ -101,7 +101,11 @@ class NewsCrawler():
                     _LOGGER.warning("Extract News List Error %s %s" % (item, err))
                     break
                 if key == "title":
-                    value = value.decode('gbk')
+                    try:
+                        value = value.decode('gbk')
+                    except Exception, err:
+                        _LOGGER.error("NewsListTitleDecodeError %s" % err)
+                        break
                 key = key.encode('utf-8')
                 value = value.encode('utf-8')
                 news[key] = value

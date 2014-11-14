@@ -12,6 +12,7 @@ PYTHON_DEPS=( "pymongo==2.2" "lxml")
 function install_dependencies()
 {
    # update to latest to avoid some packages can not found.
+   apt-get install aptitude
    aptitude update
    echo "Installing required system packages..."
    for sys_dep in ${SYS_DEPS[@]};do
